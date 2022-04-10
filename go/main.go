@@ -15,6 +15,18 @@ func search(path string, wg *sync.WaitGroup) {
 	filepath.WalkDir(path, VisitFile)
 }
 
+func removeDuplicateStr(strSlice []string) []string {
+	allKeys := make(map[string]bool)
+	list := []string{}
+	for _, item := range strSlice {
+		if _, value := allKeys[item]; !value {
+			allKeys[item] = true
+			list = append(list, item)
+		}
+	}
+	return list
+}
+
 func getpython() []string {
 	dirs := []string{}
 
@@ -28,7 +40,7 @@ func getpython() []string {
 		go search(dir, &wg)
 	}
 	wg.Wait()
-	return dirs
+	return removeDuplicateStr(dirs)
 }
 
 func main() {
@@ -47,7 +59,7 @@ func main() {
 	duration := time.Since(start)
 	fmt.Println(duration)
 
-	for _, file := range files {
+	for _, file := range removeDuplicateStr(files) {
 		fmt.Println(file)
 	}
 }
