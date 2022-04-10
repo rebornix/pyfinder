@@ -1,5 +1,6 @@
-ARG VARIANT=16-bullseye
-FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:0-${VARIANT}
+FROM alpine:3.14
+RUN apk --no-cache add git
+RUN apk add --update nodejs npm
 
 COPY --from=golang:1.18-alpine /usr/local/go/ /usr/local/go/
  
