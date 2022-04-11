@@ -5,16 +5,16 @@ import (
 	"path/filepath"
 )
 
-func getGlobalVirtualEnvDirs() []string {
+func getGlobalVirtualEnvDirs() []FileLocator {
 	homeDir, found := getUserHome()
-	dirs := []string{}
+	dirs := []FileLocator{}
 
 	if found {
 		for _, s := range []string{"Envs", ".direnv", ".venvs", ".virtualenvs", ".local/share/virtualenvs"} {
 			venvDir := filepath.Join(homeDir, s)
 			_, err := os.Stat(venvDir)
 			if !os.IsNotExist(err) {
-				dirs = append(dirs, venvDir)
+				dirs = append(dirs, FileLocator{venvDir, true})
 			}
 		}
 	}

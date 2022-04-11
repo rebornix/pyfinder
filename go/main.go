@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+var r *regexp.Regexp = regexp.MustCompile(`^python(\d+(\.\d+)?)?(\.exe)?$`)
+
 func search(rootPath string, skipFolder bool, wg *sync.WaitGroup) {
 	defer wg.Done()
 
@@ -28,8 +30,9 @@ func search(rootPath string, skipFolder bool, wg *sync.WaitGroup) {
 
 		if !info.IsDir() {
 			if strings.HasPrefix(info.Name(), "python") {
-				matched, _ := regexp.MatchString(`^python[0-9\.]*$`, info.Name())
+				matched := r.MatchString(info.Name())
 				if matched {
+
 					if info.Type()&fs.ModeSymlink == fs.ModeSymlink {
 						realPath, err := filepath.EvalSymlinks(path)
 						if err == nil {
@@ -59,29 +62,30 @@ func removeDuplicateStr(strSlice []string) []string {
 }
 
 func getpython() []string {
-	dirs := []string{}
+	dirs := []FileLocator{}
 	os := runtime.GOOS
 
 	dirs = append(dirs, getGlobalVirtualEnvDirs()...)
 	dirs = append(dirs, getPyenvDirs()...)
 
-	if os != "windows" {
+	if os == "windows" {
+		dirs = append(dirs, getWindowsKnownDirs()...)
+	} else {
 		dirs = append(dirs, getPosixBinPaths()...)
 	}
-	// dirs = append(dirs, getHomeBrewEnvDirs()...)
 
 	var wg sync.WaitGroup
 	wg.Add(len(dirs) + 2)
 
 	for _, dir := range dirs {
-		go search(dir, true, &wg)
+		go search(dir.path, dir.skipDir, &wg)
 	}
 
 	go getConda(&wg)
 	go getWindowsStoreDirs(&wg)
 
 	wg.Wait()
-	dedups := removeDuplicateStr(dirs)
+	dedups := removeDuplicateStr(files)
 
 	//TODO posix filter pyenv shims
 

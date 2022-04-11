@@ -6,7 +6,7 @@ func getSearchPathEntries() []string {
 	return []string{}
 }
 
-func getCommonPosixBinPaths() []string {
+func getCommonPosixBinPaths() []FileLocator {
 	knownPaths := []string{
 		"/bin",
 		"/etc",
@@ -35,18 +35,18 @@ func getCommonPosixBinPaths() []string {
 
 	knownPaths = append(knownPaths, getSearchPathEntries()...)
 
-	dirs := []string{}
+	dirs := []FileLocator{}
 
 	for _, p := range knownPaths {
 		_, err := os.Stat(p)
 		if !os.IsNotExist(err) {
-			dirs = append(dirs, p)
+			dirs = append(dirs, FileLocator{p, true})
 		}
 	}
 
 	return dirs
 }
 
-func getPosixBinPaths() []string {
+func getPosixBinPaths() []FileLocator {
 	return getCommonPosixBinPaths()
 }

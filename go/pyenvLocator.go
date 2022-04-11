@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 )
 
-func getPyenvDirs() []string {
+func getPyenvDirs() []FileLocator {
 	// TODO support Windows
 	homeDir, found := getUserHome()
-	dirs := []string{}
+	dirs := []FileLocator{}
 
 	if found {
 		pyenv := filepath.Join(homeDir, ".pyenv", "versions")
@@ -18,7 +18,7 @@ func getPyenvDirs() []string {
 			}
 
 			if path != pyenv && info.IsDir() {
-				dirs = append(dirs, filepath.Join(path, "bin"))
+				dirs = append(dirs, FileLocator{filepath.Join(path, "bin"), true})
 				return filepath.SkipDir
 			}
 
