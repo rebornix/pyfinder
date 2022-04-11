@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 )
 
@@ -33,4 +35,19 @@ func VisitFile(path string, info fs.DirEntry, err error) error {
 	}
 
 	return nil
+}
+
+func getUserHome() (string, bool) {
+	localOS := runtime.GOOS
+
+	if localOS == "windows" {
+		return os.LookupEnv("USERPROFILE")
+	} else {
+		p, found := os.LookupEnv("HOME")
+		if found {
+			return p, found
+		} else {
+			return os.LookupEnv("HOMEPATH")
+		}
+	}
 }

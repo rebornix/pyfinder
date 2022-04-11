@@ -2,13 +2,12 @@ package main
 
 import (
 	"io/fs"
-	"os"
 	"path/filepath"
 )
 
 func getPyenvDirs() []string {
 	// TODO support Windows
-	homeDir, found := os.LookupEnv("HOME")
+	homeDir, found := getUserHome()
 	dirs := []string{}
 
 	if found {

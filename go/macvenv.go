@@ -6,7 +6,7 @@ import (
 )
 
 func getGlobalVirtualEnvDirs() []string {
-	homeDir, found := os.LookupEnv("HOME")
+	homeDir, found := getUserHome()
 	dirs := []string{}
 
 	if found {
