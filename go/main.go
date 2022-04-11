@@ -4,15 +4,46 @@ package main
 
 import (
 	"fmt"
+	"io/fs"
 	"path/filepath"
+	"regexp"
+	"runtime"
+	"strings"
 	"sync"
 	"time"
 )
 
-func search(path string, wg *sync.WaitGroup) {
+func search(rootPath string, skipFolder bool, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	filepath.WalkDir(path, VisitFile)
+	filepath.WalkDir(rootPath, func(path string, info fs.DirEntry, err error) error {
+		if err != nil {
+			fmt.Println(err)
+			return nil
+		}
+
+		if skipFolder && info.IsDir() && path != rootPath {
+			return filepath.SkipDir
+		}
+
+		if !info.IsDir() {
+			if strings.HasPrefix(info.Name(), "python") {
+				matched, _ := regexp.MatchString(`^python[0-9\.]*$`, info.Name())
+				if matched {
+					if info.Type()&fs.ModeSymlink == fs.ModeSymlink {
+						realPath, err := filepath.EvalSymlinks(path)
+						if err == nil {
+							files = append(files, realPath)
+						}
+					} else {
+						files = append(files, path)
+					}
+				}
+			}
+		}
+
+		return nil
+	})
 }
 
 func removeDuplicateStr(strSlice []string) []string {
@@ -29,15 +60,20 @@ func removeDuplicateStr(strSlice []string) []string {
 
 func getpython() []string {
 	dirs := []string{}
+	os := runtime.GOOS
 
 	dirs = append(dirs, getGlobalVirtualEnvDirs()...)
+
+	if os != "windows" {
+		dirs = append(dirs, getPosixBinPaths()...)
+	}
 	// dirs = append(dirs, getHomeBrewEnvDirs()...)
 
 	var wg sync.WaitGroup
 	wg.Add(len(dirs))
 
 	for _, dir := range dirs {
-		go search(dir, &wg)
+		go search(dir, true, &wg)
 	}
 	wg.Wait()
 	return removeDuplicateStr(dirs)
@@ -45,17 +81,7 @@ func getpython() []string {
 
 func main() {
 	start := time.Now()
-	dirs := []string{}
-
-	dirs = append(dirs, getGlobalVirtualEnvDirs()...)
-	// dirs = append(dirs, getHomeBrewEnvDirs()...)
-	var wg sync.WaitGroup
-	wg.Add(len(dirs))
-
-	for _, dir := range dirs {
-		go search(dir, &wg)
-	}
-	wg.Wait()
+	getpython()
 	duration := time.Since(start)
 	fmt.Println(duration)
 

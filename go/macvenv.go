@@ -8,7 +8,7 @@ import (
 
 func getGlobalVirtualEnvDirs() []string {
 	homeDir, found := os.LookupEnv("HOME")
-	dirs := []string{"/usr/local/bin", "/usr/bin"}
+	dirs := []string{}
 
 	if found {
 		for _, s := range []string{"Envs", ".direnv", ".venvs", ".virtualenvs", ".local/share/virtualenvs"} {
