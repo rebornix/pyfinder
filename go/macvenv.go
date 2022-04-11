@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/fs"
 	"os"
 	"path/filepath"
 )
@@ -18,20 +17,6 @@ func getGlobalVirtualEnvDirs() []string {
 				dirs = append(dirs, venvDir)
 			}
 		}
-
-		pyenv := filepath.Join(homeDir, ".pyenv", "versions")
-		filepath.WalkDir(pyenv, func(path string, info fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-
-			if path != pyenv && info.IsDir() {
-				dirs = append(dirs, filepath.Join(path, "bin"))
-				return filepath.SkipDir
-			}
-
-			return nil
-		})
 	}
 
 	return dirs

@@ -63,6 +63,7 @@ func getpython() []string {
 	os := runtime.GOOS
 
 	dirs = append(dirs, getGlobalVirtualEnvDirs()...)
+	dirs = append(dirs, getPyenvDirs()...)
 
 	if os != "windows" {
 		dirs = append(dirs, getPosixBinPaths()...)
@@ -77,6 +78,8 @@ func getpython() []string {
 	}
 	wg.Wait()
 	dedups := removeDuplicateStr(dirs)
+
+	//TODO posix filter pyenv shims
 
 	isMacPython2Deprecated := false
 	if os == "darwin" {
