@@ -76,7 +76,25 @@ func getpython() []string {
 		go search(dir, true, &wg)
 	}
 	wg.Wait()
-	return removeDuplicateStr(dirs)
+	dedups := removeDuplicateStr(dirs)
+
+	isMacPython2Deprecated := false
+	if os == "darwin" {
+		isMacPython2Deprecated = true
+	}
+
+	if isMacPython2Deprecated {
+		macfiltered := []string{}
+		for _, value := range dedups {
+			if strings.HasPrefix(value, "python") || strings.HasPrefix(value, "/usr/bin/python") || strings.HasPrefix(value, "/usr/bin/python2") {
+			} else {
+				macfiltered = append(macfiltered, value)
+			}
+		}
+		return macfiltered
+	}
+
+	return dedups
 }
 
 func main() {

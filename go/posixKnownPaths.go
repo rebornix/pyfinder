@@ -35,12 +35,6 @@ func getCommonPosixBinPaths() []string {
 
 	knownPaths = append(knownPaths, getSearchPathEntries()...)
 
-	// isMacPython2Deprecated := false
-	// os := runtime.GOOS
-	// if os == "darwin" {
-	// 	isMacPython2Deprecated = true
-	// }
-
 	dirs := []string{}
 
 	for _, p := range knownPaths {
