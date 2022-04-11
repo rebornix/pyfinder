@@ -71,13 +71,14 @@ func getpython() []string {
 	// dirs = append(dirs, getHomeBrewEnvDirs()...)
 
 	var wg sync.WaitGroup
-	wg.Add(len(dirs) + 1)
+	wg.Add(len(dirs) + 2)
 
 	for _, dir := range dirs {
 		go search(dir, true, &wg)
 	}
 
 	go getConda(&wg)
+	go getWindowsStoreDirs(&wg)
 
 	wg.Wait()
 	dedups := removeDuplicateStr(dirs)
