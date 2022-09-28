@@ -357,3 +357,7 @@ debug
 
 # Go workspace file
 go.work
+
+# Rust
+target/
+**/*.rs.bak
