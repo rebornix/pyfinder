@@ -6,7 +6,7 @@ import (
 )
 
 func getPyenvDirs() []FileLocator {
-	// TODO support Windows
+	// TODO test Windows `getUserHome` now works on Windows
 	homeDir, found := getUserHome()
 	dirs := []FileLocator{}
 

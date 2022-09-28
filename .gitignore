@@ -361,3 +361,4 @@ go.work
 # Rust
 target/
 **/*.rs.bak
+ts/
